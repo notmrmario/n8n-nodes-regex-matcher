@@ -1,6 +1,6 @@
 {
     "name": "n8n-nodes-regex-matcher",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "n8n node to output individual regex capture groups",
     "license": "MIT",
     "homepage": "",

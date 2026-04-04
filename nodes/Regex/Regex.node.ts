@@ -86,7 +86,7 @@ export class Regex implements INodeType {
         for (const expr of expressions) {
             const multi = expr.multiple;
             const group = expr['group-name'];
-            const regex = new RegExp(`(${expr.expression})`, multi ? "giu" : "iu");
+            const regex = new RegExp(expr.expression, multi ? "giu" : "iu");
 
             for (const line of haystack.split("\n").filter(l => l.trim() !== "")) {
                 const matches = line.match(regex);
@@ -94,7 +94,8 @@ export class Regex implements INodeType {
 
                 if (multi) {
                     if (!groupMatches[group]) groupMatches[group] = [];
-                    (groupMatches[group] as string[]).push(...matches);
+                    if (matches.groups) (groupMatches[group] as string[]).push(matches.groups[group]);
+                    else (groupMatches[group] as string[]).push(...matches);
                 } else groupMatches[group] = matches[0];
             }
         }
