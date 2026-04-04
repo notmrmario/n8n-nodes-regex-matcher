@@ -1,5 +1,4 @@
 import type {
-    EngineResponse,
     IExecuteFunctions,
     INodeType,
     INodeTypeDescription,
@@ -9,8 +8,8 @@ import { NodeConnectionTypes } from 'n8n-workflow';
 
 export class Regex implements INodeType {
     description: INodeTypeDescription = {
-        name: "regex",
         displayName: "Regex",
+        name: "regex",
         // icon: {
         //     dark: "file:icon.dark.svg",
         //     light: "file:icon.light.svg"
@@ -47,8 +46,8 @@ export class Regex implements INodeType {
                         displayName: "Capture",
                         values: [
                             {
-                                name: "group-name",
                                 displayName: "Group Name",
+                                name: "group-name",
                                 placeholder: "Group",
                                 default: "",
                                 type: "string",
@@ -56,8 +55,8 @@ export class Regex implements INodeType {
                                 required: true
                             },
                             {
-                                name: "expression",
                                 displayName: "Expression",
+                                name: "expression",
                                 placeholder: "RegEx",
                                 default: "",
                                 type: "string",
@@ -65,8 +64,8 @@ export class Regex implements INodeType {
                                 required: true
                             },
                             {
+                                displayName: "Multi-Match",
                                 name: "multiple",
-                                displayName: "Multi-match",
                                 type: "boolean",
                                 default: false,
                             }
@@ -79,18 +78,18 @@ export class Regex implements INodeType {
         usableAsTool: true,
     };
 
-    async execute(this: IExecuteFunctions, response?: EngineResponse): Promise<NodeOutput> {
+    async execute(this: IExecuteFunctions): Promise<NodeOutput> {
         const haystack = this.getNodeParameter("haystack", 0) as string;
         const expressions = (this.getNodeParameter("regex-expressions", 0) as { capture: Capture[] }).capture;
         const groupMatches: { [key: string]: string[] | string | null; } = {};
 
         for (const expr of expressions) {
-            let multi = expr.multiple;
-            let group = expr['group-name'];
-            let regex = new RegExp(`(${expr.expression})`, multi ? "giu" : "iu");
+            const multi = expr.multiple;
+            const group = expr['group-name'];
+            const regex = new RegExp(`(${expr.expression})`, multi ? "giu" : "iu");
 
             for (const line of haystack.split("\n").filter(l => l.trim() !== "")) {
-                let matches = line.match(regex);
+                const matches = line.match(regex);
                 if (!matches) continue;
 
                 if (multi) {
