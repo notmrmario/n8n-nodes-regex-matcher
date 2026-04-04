@@ -94,9 +94,16 @@ export class Regex implements INodeType {
 
                 if (multi) {
                     if (!groupMatches[group]) groupMatches[group] = [];
-                    if (matches.groups) (groupMatches[group] as string[]).push(matches.groups[group]);
-                    else (groupMatches[group] as string[]).push(...matches);
-                } else groupMatches[group] = matches[0];
+                    if (matches.groups && matches.groups[group])
+                        (groupMatches[group] as string[]).push(matches.groups[group]);
+                    else
+                        (groupMatches[group] as string[]).push(...matches);
+                } else {
+                    if (matches.groups && matches.groups[group])
+                        groupMatches[group] = matches.groups[group];
+                    else
+                        groupMatches[group] = matches[0];
+                }
             }
         }
 
