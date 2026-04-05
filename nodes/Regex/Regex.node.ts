@@ -85,29 +85,36 @@ export class Regex implements INodeType {
 
         for (const expr of expressions) {
             const multi = expr.multiple;
-            const group = expr['group-name'];
+            const groups = expr['group-name'].split(",").map(g => g.trim());
             const regex = new RegExp(expr.expression, multi ? "giu" : "iu");
 
             for (const line of haystack.split("\n").filter(l => l.trim() !== "")) {
                 const matches = line.match(regex);
                 if (!matches) continue;
 
-                if (multi) {
-                    if (!groupMatches[group]) groupMatches[group] = [];
-                    if (matches.groups && matches.groups[group])
-                        (groupMatches[group] as string[]).push(matches.groups[group]);
-                    else
-                        (groupMatches[group] as string[]).push(...matches);
-                } else {
-                    if (matches.groups && matches.groups[group])
-                        groupMatches[group] = matches.groups[group];
-                    else
-                        groupMatches[group] = matches[0];
-                }
+                groups.forEach(group => {
+                    if (multi) {
+                        if (!groupMatches[group]) groupMatches[group] = [];
+                        if (matches.groups && matches.groups[group]) (groupMatches[group] as string[]).push(matches.groups[group]);
+                        else (groupMatches[group] as string[]).push(...matches);
+                    } else {
+                        if (matches.groups && matches.groups[group]) groupMatches[group] = matches.groups[group];
+                        else groupMatches[group] = matches[0];
+                    }
+                });
             }
         }
 
-        return [[{ json: { ...groupMatches } }]];
+        return [[{
+            json: Object.keys(groupMatches).filter(
+                k => groupMatches[k] instanceof Array ?
+                    groupMatches[k].length > 0 :
+                    groupMatches[k]!.trim() !== ""
+            ).reduce((o, k) => {
+                o[k] = groupMatches[k];
+                return o;
+            }, {} as { [key: string]: string[] | string | null; })
+        }]];
     }
 }
 
