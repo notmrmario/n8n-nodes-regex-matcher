@@ -68,6 +68,14 @@ export class Regex implements INodeType {
                                 name: "multiple",
                                 type: "boolean",
                                 default: false,
+                                hint: "Return an array of all matches instead of only the first one",
+                            },
+                            {
+                                displayName: "Whole Text",
+                                name: "wholeText",
+                                type: "boolean",
+                                default: false,
+                                hint: "Apply regex to the entire text instead of line by line. Enables multiline patterns (e.g. (?s), [\\s\\S])",
                             }
                         ]
                     }
@@ -85,11 +93,18 @@ export class Regex implements INodeType {
 
         for (const expr of expressions) {
             const multi = expr.multiple;
+            const wholeText = expr.wholeText ?? false; // ✅ leer nueva opción
             const groups = expr['group-name'].split(",").map(g => g.trim());
-            const regex = new RegExp(expr.expression, multi ? "giu" : "iu");
 
-            for (const line of haystack.split("\n").filter(l => l.trim() !== "")) {
-                const matches = line.match(regex);
+            const flags = [multi ? "g" : "", "i", "u", wholeText ? "s" : ""].filter(Boolean).join("");
+            const regex = new RegExp(expr.expression, flags);
+
+            const segments = wholeText
+                ? [haystack]
+                : haystack.split("\n").filter(l => l.trim() !== "");
+
+            for (const segment of segments) {
+                const matches = segment.match(regex);
                 if (!matches) continue;
 
                 groups.forEach(group => {
@@ -122,4 +137,5 @@ type Capture = {
     "group-name": string;
     "expression": string;
     "multiple": boolean;
+    "wholeText": boolean;
 };
