@@ -76,7 +76,7 @@ export class Regex implements INodeType {
                                 type: "boolean",
                                 default: false,
                                 hint: "Apply regex to the entire text instead of line by line. Enables multiline patterns (e.g. (?s), [\\s\\S])",
-                            }
+                            },
                         ]
                     }
                 ],
@@ -96,7 +96,7 @@ export class Regex implements INodeType {
             const wholeText = expr.wholeText ?? false; // ✅ leer nueva opción
             const groups = expr['group-name'].split(",").map(g => g.trim());
 
-            const flags = [multi ? "g" : "", "i", "u", wholeText ? "s" : ""].filter(Boolean).join("");
+            const flags = [multi ? "g" : "", "i", "u", wholeText ? "s" : "m"].filter(Boolean).join("");
             const regex = new RegExp(expr.expression, flags);
 
             const segments = wholeText
